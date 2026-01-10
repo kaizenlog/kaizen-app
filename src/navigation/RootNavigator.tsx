@@ -1,6 +1,7 @@
-import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from 'react';
 import { HomeScreen } from '../screens/HomeScreen';
+import { LogScreen } from '../screens/LogScreen';
 import { ProgressScreen } from '../screens/ProgressScreen';
 
 const Tab = createBottomTabNavigator();
@@ -16,15 +17,22 @@ export const RootNavigator: React.FC = () => {
         },
       }}
     >
-      <Tab.Screen 
-        name="Home" 
+      <Tab.Screen
+        name="Home"
         component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
         }}
       />
-      <Tab.Screen 
-        name="Progress" 
+      <Tab.Screen
+        name="Log"
+        component={LogScreen}
+        options={{
+          tabBarLabel: 'Log',
+        }}
+      />
+      <Tab.Screen
+        name="Progress"
         component={ProgressScreen}
         options={{
           tabBarLabel: 'Progress',

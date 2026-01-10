@@ -13,4 +13,9 @@ export const typography = {
     semibold: '600' as const,
     bold: '700' as const,
   },
+  fontFamily: {
+    regular: 'System',
+    patrick: 'PatrickHand-Regular',
+    shadows: 'ShadowsIntoLightTwo-Regular',
+  },
 };
