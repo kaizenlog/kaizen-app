@@ -1,20 +1,24 @@
-import React from 'react';
-import { View, ViewStyle } from 'react-native';
+import React, { useState } from 'react';
+import { TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { colors, spacing, typography } from '../theme';
 import { Text } from './Text';
-import { colors, spacing } from '../theme';
 
 interface CardProps {
   time: string;
   description: string;
+  onDescriptionChange: (newDescription: string) => void;
 }
 
-export const Card: React.FC<CardProps> = ({ time, description }) => {
+export const Card: React.FC<CardProps> = ({ time, description, onDescriptionChange }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempDescription, setTempDescription] = useState(description);
+
   const cardStyle: ViewStyle = {
     backgroundColor: colors.background,
     borderRadius: 12,
-    padding: spacing.lg,
-    marginHorizontal: spacing.md,
-    marginVertical: spacing.sm,
+    padding: spacing.md,
+    marginHorizontal: spacing.xs,
+    marginVertical: spacing.xs,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
@@ -28,18 +32,48 @@ export const Card: React.FC<CardProps> = ({ time, description }) => {
     width: 1,
     height: 40,
     backgroundColor: colors.border,
-    marginHorizontal: spacing.lg,
+    marginHorizontal: spacing.md,
+  };
+
+  const handleSave = () => {
+    onDescriptionChange(tempDescription);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setTempDescription(description);
+    setIsEditing(false);
   };
 
   return (
-    <View style={cardStyle}>
+    <TouchableOpacity style={cardStyle} onPress={() => setIsEditing(true)} disabled={isEditing}>
       <Text size="lg" weight="medium" color="primary" style={{ minWidth: 60 }}>
         {time}
       </Text>
       <View style={dividerStyle} />
-      <Text size="md" color="text" style={{ flex: 1 }}>
-        {description}
-      </Text>
-    </View>
+      {isEditing ? (
+        <View style={{ flex: 1 }}>
+          <TextInput
+            value={tempDescription}
+            onChangeText={setTempDescription}
+            onBlur={handleSave}
+            onSubmitEditing={handleSave}
+            autoFocus
+            multiline
+            style={{
+              fontFamily: typography.fontFamily.patrick,
+              fontSize: typography.fontSize.lg,
+              color: colors.text,
+              flex: 1,
+            }}
+            placeholder="Enter what you did"
+          />
+        </View>
+      ) : (
+        <Text fontFamily="patrick" size="lg" color="text" style={{ flex: 1 }}>
+          {description || 'Tap to add what you did...'}
+        </Text>
+      )}
+    </TouchableOpacity>
   );
 };
