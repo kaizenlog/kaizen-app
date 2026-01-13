@@ -1,7 +1,7 @@
 import { getDB } from './index'
 import { Entry } from './types'
 
-export const upsertEntry = async (entry: Entry) => {
+export const insertEntry = async (entry: Entry) => {
     const db = await getDB()
 
     await db.runAsync(
@@ -19,6 +19,14 @@ export const upsertEntry = async (entry: Entry) => {
             entry.created_at,
         ]
     )
+}
+
+export const getEntries = async () => {
+    const db = await getDB()
+    return await db.getAllAsync<Entry>(`
+    SELECT * FROM entries
+    ORDER BY date DESC, time DESC
+    `)
 }
 
 

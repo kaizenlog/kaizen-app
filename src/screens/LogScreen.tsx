@@ -1,35 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box } from '../components/Box';
 import { Button } from '../components/Button';
 import { Carousel } from '../components/Carousel';
 import { Text } from '../components/Text';
-import { generateTimeSlots } from '../utils/timeUtils';
 import { useSchedule } from '../context/ScheduleContext';
+import { getEntries, getEntriesByDate, insertEntry } from '../database/entries';
+import { Entry } from '../database/types';
+import { generateTimeSlots } from '../utils/timeUtils';
 
 export const LogScreen: React.FC = () => {
     const { config } = useSchedule();
-    
+    const today = new Date().toISOString().split('T')[0];
+
     const parseTime = (timeString: string) => {
         const [hour, minute] = timeString.split(':').map(Number);
         return { hour, minute };
     };
-    
-    const [timeSlots, setTimeSlots] = useState(() => 
+
+    const [timeSlots, setTimeSlots] = useState(() =>
         generateTimeSlots(
-            config.interval, 
-            parseTime(config.startTime), 
+            config.interval,
+            parseTime(config.startTime),
             parseTime(config.endTime)
         )
     );
 
     useEffect(() => {
         const newSlots = generateTimeSlots(
-            config.interval, 
-            parseTime(config.startTime), 
+            config.interval,
+            parseTime(config.startTime),
             parseTime(config.endTime)
         );
         setTimeSlots(newSlots);
+        loadEntries();
     }, [config]);
+
+    const loadEntries = async () => {
+        try {
+            // fetch all entries from today returned as an array of Entry objects
+            const entries = await getEntriesByDate(today);
+            const entryMap = new Map(entries.map(e => [e.time, e.description]));
+
+            setTimeSlots(prev =>
+                prev.map(slot => ({
+                    ...slot,
+                    description: entryMap.get(slot.time) || slot.description // update if there is an entry otherwise leave it 
+                }))
+            );
+        } catch (error) {
+            console.error('Failed to load entries:', error);
+        }
+    };
 
     const handleDescriptionChange = (index: number, newDescription: string) => {
         setTimeSlots(prev =>
@@ -39,9 +60,38 @@ export const LogScreen: React.FC = () => {
         );
     };
 
+    const handleSave = async () => {
+        try {
+            for (const slot of timeSlots) {
+                if (slot.description.trim()) {
+                    const entry: Entry = {
+                        id: `${today}-${slot.time}`,
+                        date: today,
+                        time: slot.time,
+                        description: slot.description,
+                        created_at: Date.now()
+                    };
+                    await insertEntry(entry);
+                }
+            }
+            console.log('Entries saved successfully');
+        } catch (error) {
+            console.error('Failed to save entries:', error);
+        }
+    };
+
+    const queryDatabase = async () => {
+        try {
+            const entries = await getEntries();
+            console.log('Database entries:', entries);
+        } catch (error) {
+            console.error('Failed to query database:', error);
+        }
+    }
+
     return (
         <Box backgroundColor="background" padding="lg" style={{ flex: 1 }}>
-            <Text fontFamily="patrick" size="xxl" weight="bold" style={{ textAlign: 'center', marginBottom: 32 }}>
+            <Text fontFamily="patrick" size="xxl" weight="bold" style={{ textAlign: 'center', marginBottom: 32, marginTop: 32 }}>
                 Today's Log
             </Text>
 
@@ -52,16 +102,13 @@ export const LogScreen: React.FC = () => {
             />
 
             <Button
-                title="Clear All"
-                variant="secondary"
-                onPress={() => {
-                    const newSlots = generateTimeSlots(
-                        config.interval, 
-                        parseTime(config.startTime), 
-                        parseTime(config.endTime)
-                    );
-                    setTimeSlots(newSlots);
-                }}
+                title="Save"
+                onPress={handleSave}
+            />
+
+            <Button
+                title="Query DB"
+                onPress={queryDatabase}
             />
         </Box>
     );
