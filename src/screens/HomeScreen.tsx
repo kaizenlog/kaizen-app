@@ -1,13 +1,16 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+import { TouchableOpacity } from 'react-native';
 import { Box } from '../components/Box';
-import { Text } from '../components/Text';
 import { Button } from '../components/Button';
 import { Dropdown } from '../components/Dropdown';
+import { Text } from '../components/Text';
 import { useSchedule } from '../context/ScheduleContext';
-import { spacing } from '../theme';
+import { useTheme } from '../theme/ThemeContext';
 
 export const HomeScreen: React.FC = () => {
   const { config, updateConfig } = useSchedule();
+  const { theme, isDark, toggleTheme } = useTheme();
 
   const timeOptions = Array.from({ length: 24 }, (_, i) => {
     const hour = i.toString().padStart(2, '0');
@@ -27,11 +30,22 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <Box backgroundColor="background" padding="lg" style={{ flex: 1 }}>
+      <TouchableOpacity
+        onPress={toggleTheme}
+        style={{ position: 'absolute', top: 40, right: 20, zIndex: 10 }}
+      >
+        <Ionicons
+          name={isDark ? 'sunny' : 'moon'}
+          size={24}
+          color={theme.colors.text}
+        />
+      </TouchableOpacity>
+
       <Text fontFamily="patrick" size="xxl" weight="bold" style={{ textAlign: 'center', marginBottom: 48, marginTop: 32 }}>
         Kaizen 改善
       </Text>
 
-      <Text fontFamily="patrick" size="lg" style={{ textAlign: 'center', marginBottom: 48 }}>
+      <Text size="lg" style={{ textAlign: 'center', marginBottom: 48 }}>
         Configure your tracking schedule
       </Text>
 
@@ -59,7 +73,7 @@ export const HomeScreen: React.FC = () => {
       <Button
         title="Update Schedule"
         onPress={handleUpdateConfig}
-        style={{ marginTop: spacing.lg }}
+        style={{ marginTop: theme.spacing.lg }}
       />
     </Box>
   );

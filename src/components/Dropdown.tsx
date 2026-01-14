@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Modal, FlatList } from 'react-native';
 import { Text } from './Text';
-import { colors, spacing } from '../theme';
+import { useTheme } from '../theme/ThemeContext';
 
 interface DropdownProps {
   label: string;
@@ -11,13 +11,14 @@ interface DropdownProps {
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({ label, value, options, onSelect }) => {
+  const { theme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   const selectedOption = options.find(opt => opt.value === value);
 
   return (
-    <View style={{ marginBottom: spacing.md }}>
-      <Text size="md" weight="medium" style={{ marginBottom: spacing.sm }}>
+    <View style={{ marginBottom: theme.spacing.md }}>
+      <Text size="md" weight="medium" style={{ marginBottom: theme.spacing.sm }}>
         {label}
       </Text>
       
@@ -25,10 +26,10 @@ export const Dropdown: React.FC<DropdownProps> = ({ label, value, options, onSel
         onPress={() => setIsOpen(true)}
         style={{
           borderWidth: 1,
-          borderColor: colors.border,
+          borderColor: theme.colors.border,
           borderRadius: 8,
-          padding: spacing.md,
-          backgroundColor: colors.background,
+          padding: theme.spacing.md,
+          backgroundColor: theme.colors.surface,
         }}
       >
         <Text size="md" color={selectedOption ? 'text' : 'textSecondary'}>
@@ -42,13 +43,13 @@ export const Dropdown: React.FC<DropdownProps> = ({ label, value, options, onSel
             flex: 1,
             backgroundColor: 'rgba(0,0,0,0.5)',
             justifyContent: 'center',
-            padding: spacing.lg,
+            padding: theme.spacing.lg,
           }}
           onPress={() => setIsOpen(false)}
         >
           <View
             style={{
-              backgroundColor: colors.background,
+              backgroundColor: theme.colors.surface,
               borderRadius: 12,
               maxHeight: 300,
             }}
@@ -59,9 +60,9 @@ export const Dropdown: React.FC<DropdownProps> = ({ label, value, options, onSel
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={{
-                    padding: spacing.md,
+                    padding: theme.spacing.md,
                     borderBottomWidth: 1,
-                    borderBottomColor: colors.surface,
+                    borderBottomColor: theme.colors.border,
                   }}
                   onPress={() => {
                     onSelect(item.value);

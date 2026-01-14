@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { ScheduleProvider } from './src/context/ScheduleContext';
+import { ThemeProvider } from './src/theme/ThemeContext';
 
 function App() {
   const [fontsLoaded] = useFonts({
@@ -17,12 +18,14 @@ function App() {
   }
 
   return (
-    <ScheduleProvider>
-      <NavigationContainer>
-        <StatusBar style="auto" />
-        <RootNavigator />
-      </NavigationContainer>
-    </ScheduleProvider>
+    <ThemeProvider>
+      <ScheduleProvider>
+        <NavigationContainer>
+          <StatusBar style="auto" />
+          <RootNavigator />
+        </NavigationContainer>
+      </ScheduleProvider>
+    </ThemeProvider>
   );
 }
 

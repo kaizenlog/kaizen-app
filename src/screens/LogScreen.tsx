@@ -7,9 +7,13 @@ import { useSchedule } from '../context/ScheduleContext';
 import { getEntries, getEntriesByDate, insertEntry } from '../database/entries';
 import { Entry } from '../database/types';
 import { generateTimeSlots } from '../utils/timeUtils';
+import { useTheme } from '../theme/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
 
 export const LogScreen: React.FC = () => {
     const { config } = useSchedule();
+    const { theme, isDark, toggleTheme } = useTheme();
     const today = new Date().toISOString().split('T')[0];
 
     const parseTime = (timeString: string) => {
@@ -60,6 +64,14 @@ export const LogScreen: React.FC = () => {
         );
     };
 
+    const handleCategoryChange = (index: number, newCategory: string) => {
+        setTimeSlots(prev =>
+            prev.map((slot, i) =>
+                i === index ? { ...slot, category: newCategory } : slot
+            )
+        );
+    };
+
     const handleSave = async () => {
         try {
             for (const slot of timeSlots) {
@@ -91,6 +103,17 @@ export const LogScreen: React.FC = () => {
 
     return (
         <Box backgroundColor="background" padding="lg" style={{ flex: 1 }}>
+            <TouchableOpacity 
+                onPress={toggleTheme}
+                style={{ position: 'absolute', top: 40, right: 20, zIndex: 10 }}
+            >
+                <Ionicons 
+                    name={isDark ? 'sunny' : 'moon'} 
+                    size={24} 
+                    color={theme.colors.text} 
+                />
+            </TouchableOpacity>
+            
             <Text fontFamily="patrick" size="xxl" weight="bold" style={{ textAlign: 'center', marginBottom: 32, marginTop: 32 }}>
                 Today's Log
             </Text>
@@ -98,12 +121,14 @@ export const LogScreen: React.FC = () => {
             <Carousel
                 items={timeSlots}
                 onItemChange={handleDescriptionChange}
+                onCategoryChange={handleCategoryChange}
                 style={{ flex: 1, marginBottom: 24 }}
             />
 
             <Button
                 title="Save"
                 onPress={handleSave}
+                style={{ marginBottom: 8 }}
             />
 
             <Button

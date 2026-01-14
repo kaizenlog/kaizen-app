@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, TouchableOpacityProps } from 'react-native';
+import { useTheme } from '../theme/ThemeContext';
 import { Text } from './Text';
-import { colors, spacing } from '../theme';
 
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
@@ -14,11 +14,13 @@ export const Button: React.FC<ButtonProps> = ({
   style,
   ...props
 }) => {
+  const { theme } = useTheme();
+  
   const buttonStyle = {
-    backgroundColor: variant === 'primary' ? colors.primary : colors.secondary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderRadius: 8,
+    backgroundColor: variant === 'primary' ? theme.colors.primary : theme.colors.secondary,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    borderRadius: 32,
     alignItems: 'center' as const,
   };
 

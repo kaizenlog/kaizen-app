@@ -42,3 +42,30 @@ export const getEntriesByDate = async (date: string): Promise<Entry[]> => {
         [date]
     )
 }
+
+export const calculateStreak = async (): Promise<number> => {
+    const db = await getDB()
+    
+    const uniqueDates = await db.getAllAsync<{ date: string }>(
+        'SELECT DISTINCT date FROM entries ORDER BY date DESC'
+    )
+    
+    if (uniqueDates.length === 0) return 0
+    
+    const today = new Date().toISOString().split('T')[0]
+    let streak = 0
+    
+    for (let i = 0; i < uniqueDates.length; i++) {
+        const expectedDate = new Date()
+        expectedDate.setDate(expectedDate.getDate() - i)
+        const expectedDateStr = expectedDate.toISOString().split('T')[0]
+        
+        if (uniqueDates[i].date === expectedDateStr) {
+            streak++
+        } else {
+            break
+        }
+    }
+    
+    return streak
+}
