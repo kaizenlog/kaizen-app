@@ -1,4 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 import { Box } from '../components/Box';
 import { Button } from '../components/Button';
 import { Carousel } from '../components/Carousel';
@@ -6,15 +8,22 @@ import { Text } from '../components/Text';
 import { useSchedule } from '../context/ScheduleContext';
 import { getEntries, getEntriesByDate, insertEntry } from '../database/entries';
 import { Entry } from '../database/types';
-import { generateTimeSlots } from '../utils/timeUtils';
 import { useTheme } from '../theme/ThemeContext';
-import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native';
+import { generateTimeSlots } from '../utils/timeUtils';
 
 export const LogScreen: React.FC = () => {
     const { config } = useSchedule();
     const { theme, isDark, toggleTheme } = useTheme();
-    const today = new Date().toISOString().split('T')[0];
+    
+    const getLocalDate = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    
+    const today = getLocalDate();
 
     const parseTime = (timeString: string) => {
         const [hour, minute] = timeString.split(':').map(Number);
@@ -103,18 +112,18 @@ export const LogScreen: React.FC = () => {
 
     return (
         <Box backgroundColor="background" padding="lg" style={{ flex: 1 }}>
-            <TouchableOpacity 
+            <TouchableOpacity
                 onPress={toggleTheme}
                 style={{ position: 'absolute', top: 40, right: 20, zIndex: 10 }}
             >
-                <Ionicons 
-                    name={isDark ? 'sunny' : 'moon'} 
-                    size={24} 
-                    color={theme.colors.text} 
+                <Ionicons
+                    name={isDark ? 'sunny' : 'moon'}
+                    size={24}
+                    color={theme.colors.text}
                 />
             </TouchableOpacity>
-            
-            <Text fontFamily="patrick" size="xxl" weight="bold" style={{ textAlign: 'center', marginBottom: 32, marginTop: 32 }}>
+
+            <Text fontFamily="patrick" size="xxl" weight="bold" color="primary" style={{ textAlign: 'center', marginBottom: 32, marginTop: 32 }}>
                 Today's Log
             </Text>
 

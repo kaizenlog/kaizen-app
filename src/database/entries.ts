@@ -52,13 +52,19 @@ export const calculateStreak = async (): Promise<number> => {
     
     if (uniqueDates.length === 0) return 0
     
-    const today = new Date().toISOString().split('T')[0]
+    const getLocalDate = (daysAgo: number = 0) => {
+        const date = new Date();
+        date.setDate(date.getDate() - daysAgo);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    
     let streak = 0
     
     for (let i = 0; i < uniqueDates.length; i++) {
-        const expectedDate = new Date()
-        expectedDate.setDate(expectedDate.getDate() - i)
-        const expectedDateStr = expectedDate.toISOString().split('T')[0]
+        const expectedDateStr = getLocalDate(i);
         
         if (uniqueDates[i].date === expectedDateStr) {
             streak++

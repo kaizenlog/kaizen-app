@@ -23,6 +23,8 @@ export const Card: React.FC<CardProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [tempDescription, setTempDescription] = useState(description);
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const categoryOptions = [
     { label: 'None', value: 'None' },
     { label: 'Work', value: 'Work' },
@@ -36,11 +38,14 @@ export const Card: React.FC<CardProps> = ({
     padding: theme.spacing.md,
     marginHorizontal: theme.spacing.xs,
     marginVertical: theme.spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
+    zIndex: isDropdownOpen ? 1000 : 1,
   };
 
   const dividerStyle: ViewStyle = {
@@ -57,49 +62,92 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <View style={cardStyle}>
+      <Text size="lg" weight="medium" color="primary" style={{ minWidth: 60 }}>
+        {time}
+      </Text>
+      <View style={dividerStyle} />
+      
       <TouchableOpacity
-        style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+        style={{ flex: 1 }}
         onPress={() => setIsEditing(true)}
         disabled={isEditing}
       >
-        <Text size="lg" weight="medium" color="primary" style={{ minWidth: 60 }}>
-          {time}
-        </Text>
-        <View style={dividerStyle} />
         {isEditing ? (
-          <View style={{ flex: 1 }}>
-            <TextInput
-              value={tempDescription}
-              onChangeText={setTempDescription}
-              onBlur={handleSave}
-              onSubmitEditing={handleSave}
-              autoFocus
-              multiline
-              style={{
-                fontFamily: theme.typography.fontFamily.patrick,
-                fontSize: theme.typography.fontSize.lg,
-                color: theme.colors.text,
-                flex: 1,
-              }}
-              placeholder="Enter what you did"
-              placeholderTextColor={theme.colors.textSecondary}
-            />
-          </View>
+          <TextInput
+            value={tempDescription}
+            onChangeText={setTempDescription}
+            onBlur={handleSave}
+            onSubmitEditing={handleSave}
+            autoFocus
+            multiline
+            style={{
+              fontFamily: theme.typography.fontFamily.patrick,
+              fontSize: theme.typography.fontSize.lg,
+              color: theme.colors.text,
+            }}
+            placeholder="Enter what you did"
+            placeholderTextColor={theme.colors.textSecondary}
+          />
         ) : (
-          <Text fontFamily="patrick" size="lg" color="text" style={{ flex: 1 }}>
+          <Text fontFamily="patrick" size="lg" color="text">
             {description || 'Tap to add what you did...'}
           </Text>
         )}
       </TouchableOpacity>
 
-      <View style={{ width: 100, marginLeft: theme.spacing.sm }}>
-        <Dropdown
-          label=""
-          options={categoryOptions}
-          value={category}
-          onSelect={onCategoryChange}
-        />
-      </View>
+      <TouchableOpacity
+        onPress={() => setIsDropdownOpen(!isDropdownOpen)}
+        style={{
+          borderWidth: 1,
+          borderColor: theme.colors.secondary,
+          borderRadius: 6,
+          paddingHorizontal: theme.spacing.sm,
+          paddingVertical: theme.spacing.xs,
+          marginLeft: theme.spacing.sm,
+        }}
+      >
+        <Text size="sm" color="secondary">
+          {category}
+        </Text>
+      </TouchableOpacity>
+
+      {isDropdownOpen && (
+        <View
+          style={{
+            position: 'absolute',
+            right: theme.spacing.md,
+            top: 60,
+            backgroundColor: theme.colors.surface,
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: theme.colors.border,
+            zIndex: 2000,
+            elevation: 10,
+            minWidth: 120,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+          }}
+        >
+          {categoryOptions.map((option, index) => (
+            <TouchableOpacity
+              key={option.value}
+              onPress={() => {
+                onCategoryChange(option.value);
+                setIsDropdownOpen(false);
+              }}
+              style={{
+                padding: theme.spacing.md,
+                borderBottomWidth: index < categoryOptions.length - 1 ? 1 : 0,
+                borderBottomColor: theme.colors.border,
+              }}
+            >
+              <Text size="md">{option.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
     </View>
   );
 };
