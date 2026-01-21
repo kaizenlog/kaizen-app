@@ -14,7 +14,7 @@ import { generateTimeSlots } from '../utils/timeUtils';
 export const LogScreen: React.FC = () => {
     const { config } = useSchedule();
     const { theme, isDark, toggleTheme } = useTheme();
-    
+
     const getLocalDate = () => {
         const now = new Date();
         const year = now.getFullYear();
@@ -22,7 +22,7 @@ export const LogScreen: React.FC = () => {
         const day = String(now.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     };
-    
+
     const today = getLocalDate();
 
     const parseTime = (timeString: string) => {
