@@ -4,6 +4,7 @@ import { TouchableOpacity } from 'react-native';
 import { Box } from '../components/Box';
 import { Button } from '../components/Button';
 import { Carousel } from '../components/Carousel';
+import { ProgressBar } from '../components/ProgressBar';
 import { Text } from '../components/Text';
 import { useSchedule } from '../context/ScheduleContext';
 import { getEntries, getEntriesByDate, insertEntry } from '../database/entries';
@@ -52,13 +53,17 @@ export const LogScreen: React.FC = () => {
         try {
             // fetch all entries from today returned as an array of Entry objects
             const entries = await getEntriesByDate(today);
-            const entryMap = new Map(entries.map(e => [e.time, e.description]));
+            const entryMap = new Map(entries.map(e => [e.time, { description: e.description, category: e.category || 'None' }]));
 
             setTimeSlots(prev =>
-                prev.map(slot => ({
-                    ...slot,
-                    description: entryMap.get(slot.time) || slot.description // update if there is an entry otherwise leave it 
-                }))
+                prev.map(slot => {
+                    const entry = entryMap.get(slot.time);
+                    return {
+                        ...slot,
+                        description: entry?.description || slot.description,
+                        category: entry?.category || 'None'
+                    };
+                })
             );
         } catch (error) {
             console.error('Failed to load entries:', error);
@@ -90,6 +95,7 @@ export const LogScreen: React.FC = () => {
                         date: today,
                         time: slot.time,
                         description: slot.description,
+                        category: slot.category,
                         created_at: Date.now()
                     };
                     await insertEntry(entry);
@@ -110,6 +116,10 @@ export const LogScreen: React.FC = () => {
         }
     }
 
+    // Calculate progress
+    const filledEntries = timeSlots.filter(slot => slot.description && slot.description.trim()).length;
+    const totalEntries = timeSlots.length;
+
     return (
         <Box backgroundColor="background" padding="lg" style={{ flex: 1 }}>
             <TouchableOpacity
@@ -123,9 +133,11 @@ export const LogScreen: React.FC = () => {
                 />
             </TouchableOpacity>
 
-            <Text fontFamily="patrick" size="xxl" weight="bold" color="primary" style={{ textAlign: 'center', marginBottom: 32, marginTop: 32 }}>
+            <Text fontFamily="patrick" size="xxl" weight="bold" color="primary" style={{ textAlign: 'center', marginBottom: 24, marginTop: 32 }}>
                 Today's Log
             </Text>
+
+            <ProgressBar current={filledEntries} total={totalEntries} />
 
             <Carousel
                 items={timeSlots}

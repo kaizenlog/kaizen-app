@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { Dropdown } from './Dropdown';
 import { Text } from './Text';
 
 interface CardProps {
@@ -29,8 +28,19 @@ export const Card: React.FC<CardProps> = ({
     { label: 'None', value: 'None' },
     { label: 'Work', value: 'Work' },
     { label: 'Study', value: 'Study' },
-    { label: 'Gym', value: 'Gym' }
+    { label: 'Gym', value: 'Gym' },
+    { label: 'Tomfoolery', value: 'Tomfoolery' }
   ];
+
+  const getCategoryColor = (categoryValue: string) => {
+    switch (categoryValue) {
+      case 'Work': return theme.colors.primary;
+      case 'Study': return theme.colors.secondary;
+      case 'Gym': return '#4ADE80';
+      case 'Tomfoolery': return '#FBBF24';
+      default: return theme.colors.textSecondary; // Grey for 'None'
+    }
+  };
 
   const cardStyle: ViewStyle = {
     backgroundColor: theme.colors.surface,
@@ -66,10 +76,13 @@ export const Card: React.FC<CardProps> = ({
         {time}
       </Text>
       <View style={dividerStyle} />
-      
+
       <TouchableOpacity
         style={{ flex: 1 }}
-        onPress={() => setIsEditing(true)}
+        onPress={() => {
+          setTempDescription(description);
+          setIsEditing(true);
+        }}
         disabled={isEditing}
       >
         {isEditing ? (
@@ -99,14 +112,14 @@ export const Card: React.FC<CardProps> = ({
         onPress={() => setIsDropdownOpen(!isDropdownOpen)}
         style={{
           borderWidth: 1,
-          borderColor: theme.colors.secondary,
+          borderColor: getCategoryColor(category),
           borderRadius: 6,
           paddingHorizontal: theme.spacing.sm,
           paddingVertical: theme.spacing.xs,
           marginLeft: theme.spacing.sm,
         }}
       >
-        <Text size="sm" color="secondary">
+        <Text size="sm" style={{ color: getCategoryColor(category) }}>
           {category}
         </Text>
       </TouchableOpacity>

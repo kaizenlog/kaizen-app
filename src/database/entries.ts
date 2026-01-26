@@ -15,7 +15,7 @@ export const insertEntry = async (entry: Entry) => {
             entry.date,
             entry.time,
             entry.description,
-            entry.category ?? null, // category will be null if not defined
+            entry.category,
             entry.created_at,
         ]
     )
@@ -45,13 +45,13 @@ export const getEntriesByDate = async (date: string): Promise<Entry[]> => {
 
 export const calculateStreak = async (): Promise<number> => {
     const db = await getDB()
-    
+
     const uniqueDates = await db.getAllAsync<{ date: string }>(
         'SELECT DISTINCT date FROM entries ORDER BY date DESC'
     )
-    
+
     if (uniqueDates.length === 0) return 0
-    
+
     const getLocalDate = (daysAgo: number = 0) => {
         const date = new Date();
         date.setDate(date.getDate() - daysAgo);
@@ -60,18 +60,18 @@ export const calculateStreak = async (): Promise<number> => {
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     };
-    
+
     let streak = 0
-    
+
     for (let i = 0; i < uniqueDates.length; i++) {
         const expectedDateStr = getLocalDate(i);
-        
+
         if (uniqueDates[i].date === expectedDateStr) {
             streak++
         } else {
             break
         }
     }
-    
+
     return streak
 }

@@ -4,7 +4,7 @@ export const generateTimeSlots = (
   intervalMinutes: number = 30,
   start: Time = { hour: 9, minute: 0 },
   end: Time = { hour: 21, minute: 0 }
-): { time: string; description: string }[] => {
+): { time: string; description: string; category: string }[] => {
   const slots = []
 
   // convert time to minutes
@@ -23,6 +23,7 @@ export const generateTimeSlots = (
     slots.push({
       time: timeString,
       description: "",
+      category: "None",
     })
   }
 
